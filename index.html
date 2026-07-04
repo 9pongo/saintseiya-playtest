@@ -260,6 +260,7 @@ async function replayFeature(feat){
 
 let bet=2,steps=[0.4,2,20,200],busy=false;
 function setInfo(t,feat){const e=$("#info");e.textContent=t;e.className="infobar"+(feat?" feat":"");}
+function featUI(hide){for(const s of [".scbar",".ctrl","#buyBtn"]){const e=$(s);if(e)e.style.display=hide?"none":"";}}
 function renderJP(){const t=["GRAND","MAJOR","MINOR","MINI"];$("#jp").innerHTML=t.map(x=>`<div class="t"><b>${x}</b><span class="v">0.00</span></div>`).join("");}
 async function launch(){const r=await api("/launch");steps=r.game.betSteps||steps;bet=r.game.defaultBet||2;
   $("#bal").textContent=fmt(r.balance);$("#bet").textContent=bet;renderJP();
@@ -271,7 +272,7 @@ async function doSpin(buyMode){if(busy)return;busy=true;$("#spin").disabled=true
   const tl=r.timeline,mult=r.win/bet;
   if(!buyMode){await Board.spinAnim();if(tl&&tl.base){const g=await Board.playSteps(tl.base.grid0,tl.base.balls0,tl.base.steps);
     if((tl.base.scatter||0)>=3||(tl.base.scatterGold||0)>=1)Board.flashScatter(g);}}
-  if(tl&&tl.feature){await sleep(200);await replayFeature(tl.feature);}
+  if(tl&&tl.feature){featUI(true);await sleep(200);await replayFeature(tl.feature);Board.setRows(5);featUI(false);}
   $("#bal").textContent=fmt(r.balance);
   if(r.win>0){$("#winv").textContent=fmt(r.win);await WinP.show(r.win,mult);setInfo(`贏 ${fmt(r.win)}（${mult.toFixed(1)}×）`);}
   else setInfo("再接再厲");
